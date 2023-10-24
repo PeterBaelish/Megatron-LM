@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """Transformer."""
+import time
 import math
 from contextlib import nullcontext
 import torch
@@ -654,6 +655,8 @@ class ParallelAttention(MegatronModule):
         # =================================================
         # Pre-allocate memory for key-values for inference.
         # =================================================
+        st = time.time()
+        
         if inference_params:
             if self.layer_number not in inference_params.key_value_memory_dict:
                 inf_max_seq_len = inference_params.max_sequence_len
@@ -784,7 +787,8 @@ class ParallelAttention(MegatronModule):
         # Output. [sq, b, h]
         # =================
         output, bias = self.dense(context_layer)
-
+        tt = time.time() - st
+        print(f"flash attn time: {tt:.6f}")
         return output, bias
 
 
